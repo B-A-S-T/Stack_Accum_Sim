@@ -24,46 +24,62 @@
 /* Typedefs and Defines*/
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 
 typedef int32_t mem_addr;
 typedef int32_t mem_word;
 typedef int32_t instruction;
 
-#define MAX_SEG_SIZE 8388607
+#define MAX_SEG_SIZE 33554428
 #define TEXT_START ((mem_word) 0x50000000)
 #define DATA_START ((mem_word) 0x40000000)
 #define STACK_BOTTOM  ((mem_word) 0x30000000) /*Grows Down*/
 #define KERNAL_START ((mem_word) 0x60000000)
 
-#define DATA_TOP (TEXT_START -4)
-#define TEXT_TOP (KERNAL_TOP -4)
-#define KERNAL_TOP ((mem_word) (0x70000000 -4))
+#define NUM_OF_TOKENS 200
+/* We subtract 1 mem_word(32 bits) from the address to get the top */
+
+#define DATA_TOP (TEXT_START -1)
+#define TEXT_TOP (KERNAL_TOP -1)
+#define KERNAL_TOP ((mem_word) (0x70000000 -1))
 
 /*Global Variables:  */
 
-instruction text_segment;
+instruction* text_segment;
 mem_word *data_segment;
 mem_word *stack_segment;
 mem_word *kernal_segment;
 mem_addr stack_top;
 mem_addr data_limit;
+char *sourceTokens[NUM_OF_TOKENS];
 
 /* Prototypes */
 
-instruction* parse_source_code(char *filename);
-mem_word load(mem_addr address);
-void push(mem_word value);
-void pop(mem_word value);
-void add();
-void mult();
-void end();
+void parse_source_code(char *filename);
+mem_word read_mem(mem_addr address);
+mem_word read_inst(mem_addr address);
+void write_instr(mem_addr address, instruction instr);
+void write_mem(mem_addr address, mem_word value);
+//mem_word load(mem_addr address);
+//void push(mem_word value);
+//void pop(mem_word value);
+//void add();
+//void mult();
+//void end();
 
 int main(int argc, char *argv[]){
+    
+    printf("Hi");
+    //parse_source_code("/home/ian/Documents/Stack_Accum_Sim/testing.txt");
+//    printf("First: %s\n",sourceTokens[0]);
 
-
-return 0;
+    return 0;
 }
 
+/* Each segment will have 33,554,431 bytes, divide this by
+
+    4 and we get 8,388,607 indexes in each array*/
 
 void make_memory(){
 
@@ -83,28 +99,40 @@ void make_memory(){
 
 }
 
-instruction* parse_source_code(char *filename);{
-
+void parse_source_code(char *filename){
+    printf("Jue");
     FILE *fp;
+    size_t length = 0;
+    ssize_t read;
+    char *token = NULL;
     char line[255];
-
+    int tokenCounter = 0;
+    printf("wuenrlkjwer");    
     fp = fopen(filename, "r");
-    
     if(fp == NULL){
        printf("Could not open file.\n");
-        return 0; 
+        exit (1);
     }
-    fscanf(fp, "%s", line);
+    printf("Ok going to tokens");
+    while((read = getline(&line, &length, fp)) != -1){
+        token = strtok(line, "\t");
+        printf("hi:%s", token);    
+        while(token != NULL) {
+            sourceTokens[tokenCounter] = token;
+            tokenCounter += 1;
+            token = strtok(NULL, "\t");
+        }
+    }
 
 }
 
-
+/* For each of the reads and writes we first check to see if the address
+    is less than its address top boundary and then the bottom.*/
 mem_word read_mem(mem_addr address){
     if((address <  DATA_TOP) && (address >= DATA_START))
         return data_segment[(address - DATA_START) >> 2];
     else{
-        printf("We couldn't access that address check addresses
-                avaliable\n");
+        printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
     }
 }
@@ -113,8 +141,7 @@ mem_word read_inst(mem_addr address){
     if((address <  TEXT_TOP) && (address >= TEXT_START))
         return text_segment[(address - TEXT_START) >> 2];
     else{
-        printf("We couldn't access that address check addresses
-                avaliable\n");
+        printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
     }
 }
@@ -124,8 +151,7 @@ void write_instr(mem_addr address, instruction instr){
     if((address <  TEXT_TOP) && (address >= TEXT_START))
         text_segment[(address - TEXT_START) >> 2] = instr;
     else{
-        printf("We couldn't access that address check addresses
-                avaliable\n");
+        printf("We couldn't access that address check address avaliable\n");
         return NULL;
     }
 }
@@ -135,8 +161,7 @@ void write_mem(mem_addr address, mem_word value){
     if((address < DATA_TOP) && (address >= DATA_START))
         data_segment[(address - DATA_START) >> 2] = value;
     else{
-        printf("We couldn't access that address check addresses
-                avaliable\n");
+        printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
     }
 }
