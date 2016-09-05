@@ -1,3 +1,32 @@
--TODO 
+Stack and Accumulator machine architecture using 32 bit addressing based off of
+  the SPIM MIPS simulator.
+  
+  
+  Reference code:
+  http://www.cs.rpi.edu/~mehtaa/comporg/spim-8.0/CPU/mem.c
+  https://www.unf.edu/public/cda4102/ychua/spim/mem.
+  
+  
+  STACK INSTRUCTIONS:
+  Push MEM_ADDRESS
+  POP MEM_ADDRESS
+  ADD 
+  MUL
+  END
+  
+  gcc stackSim.c -o StackMachine
+  ./StackMachine source_code_filename
 
-
+  Example Source code for stack machine:
+  .data
+  MEM_ADDRESS Value
+  MEM_ADDRESS Value
+  
+  .text
+  push MEM_ADDRESS
+  push MEM_ADDRESS
+  add
+  END
+  
+  -TODO: ACCUMULATOR
+  
