@@ -35,18 +35,23 @@ typedef int32_t instruction;
 #define STACK_BOTTOM  ((mem_word) 0x30000000) /*Grows Down*/
 #define KERNAL_START ((mem_word) 0x60000000)
 
+#define DATA_TOP (TEXT_START -4)
+#define TEXT_TOP (KERNAL_TOP -4)
+#define KERNAL_TOP ((mem_word) (0x70000000 -4))
 
 /*Global Variables:  */
 
 instruction text_segment;
-mem_word data_segment;
-mem_word stack_segment;
-mem_word kernal_segment;
-mem_word stack_top;
+mem_word *data_segment;
+mem_word *stack_segment;
+mem_word *kernal_segment;
+mem_addr stack_top;
+mem_addr data_limit;
 
 /* Prototypes */
 
 instruction* parse_source_code(char *filename);
+mem_word load(mem_addr address);
 void push(mem_word value);
 void pop(mem_word value);
 void add();
@@ -58,4 +63,92 @@ int main(int argc, char *argv[]){
 
 return 0;
 }
+
+
+void make_memory(){
+
+    data_segment = malloc(MAX_SEG_SIZE);
+    if(data_segment == NULL)
+        exit(1);
+
+    stack_segment = malloc(MAX_SEG_SIZE);
+    if(stack_segment == NULL)
+        exit(1);
+    kernal_segment = malloc(MAX_SEG_SIZE);
+    if(kernal_segment == NULL)
+        exit(1);
+    text_segment = malloc(MAX_SEG_SIZE);
+    if(text_segment == NULL) 
+        exit(1);
+
+}
+
+instruction* parse_source_code(char *filename);{
+
+    FILE *fp;
+    char line[255];
+
+    fp = fopen(filename, "r");
+    
+    if(fp == NULL){
+       printf("Could not open file.\n");
+        return 0; 
+    }
+    fscanf(fp, "%s", line);
+
+}
+
+
+mem_word read_mem(mem_addr address){
+    if((address <  DATA_TOP) && (address >= DATA_START))
+        return data_segment[(address - DATA_START) >> 2];
+    else{
+        printf("We couldn't access that address check addresses
+                avaliable\n");
+        return NULL;
+    }
+}
+
+mem_word read_inst(mem_addr address){
+    if((address <  TEXT_TOP) && (address >= TEXT_START))
+        return text_segment[(address - TEXT_START) >> 2];
+    else{
+        printf("We couldn't access that address check addresses
+                avaliable\n");
+        return NULL;
+    }
+}
+
+void write_instr(mem_addr address, instruction instr){
+
+    if((address <  TEXT_TOP) && (address >= TEXT_START))
+        text_segment[(address - TEXT_START) >> 2] = instr;
+    else{
+        printf("We couldn't access that address check addresses
+                avaliable\n");
+        return NULL;
+    }
+}
+
+
+void write_mem(mem_addr address, mem_word value){
+    if((address < DATA_TOP) && (address >= DATA_START))
+        data_segment[(address - DATA_START) >> 2] = value;
+    else{
+        printf("We couldn't access that address check addresses
+                avaliable\n");
+        return NULL;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 
