@@ -1,2 +1,8 @@
-ok in file
+.data
 
+
+.text
+push x
+push y
+
+add

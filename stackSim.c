@@ -70,10 +70,8 @@ void write_mem(mem_addr address, mem_word value);
 
 int main(int argc, char *argv[]){
     
-    printf("Hi");
-    //parse_source_code("/home/ian/Documents/Stack_Accum_Sim/testing.txt");
-//    printf("First: %s\n",sourceTokens[0]);
-
+    parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
+    printf("The first token is:%s \n", sourceTokens[1]);
     return 0;
 }
 
@@ -100,27 +98,26 @@ void make_memory(){
 }
 
 void parse_source_code(char *filename){
-    printf("Jue");
     FILE *fp;
     size_t length = 0;
     ssize_t read;
     char *token = NULL;
-    char line[255];
+    char *line = NULL;
     int tokenCounter = 0;
-    printf("wuenrlkjwer");    
-    fp = fopen(filename, "r");
+    fp = fopen("/home/ian/Stack_Accum_Sim/testing.txt", "r");
     if(fp == NULL){
        printf("Could not open file.\n");
         exit (1);
     }
-    printf("Ok going to tokens");
     while((read = getline(&line, &length, fp)) != -1){
-        token = strtok(line, "\t");
-        printf("hi:%s", token);    
+        token = strtok(line, " \t");
         while(token != NULL) {
+            if(strcmp(token, "\n") != 0){
+            printf("BNoops:%d    %s\n", length, token);
             sourceTokens[tokenCounter] = token;
             tokenCounter += 1;
-            token = strtok(NULL, "\t");
+            }
+            token = strtok(NULL, " \t");
         }
     }
 
