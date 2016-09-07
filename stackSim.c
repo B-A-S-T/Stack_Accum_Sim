@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 typedef int32_t mem_addr;
 typedef int32_t mem_word;
@@ -70,8 +70,13 @@ void write_mem(mem_addr address, mem_word value);
 
 int main(int argc, char *argv[]){
     
+    make_memory();
     parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
-    printf("The first token is:%s \n", sourceTokens[1]);
+    printf("The first token is:%08x \n", text_segment[0]);
+    free(data_segment);
+    free(stack_segment);
+    free(kernal_segment);
+    free(text_segment);
     return 0;
 }
 
@@ -113,8 +118,9 @@ void parse_source_code(char *filename){
         token = strtok(line, " \t");
         while(token != NULL) {
             if(strcmp(token, "\n") != 0){
-            printf("BNoops:%d    %s\n", length, token);
-            sourceTokens[tokenCounter] = token;
+            printf("BNoops:%d    %08x\n", length, *token);
+            text_segment[tokenCounter] = *(instruction*) token;
+            printf("Token after: %08x\n", text_segment[tokenCounter]);
             tokenCounter += 1;
             }
             token = strtok(NULL, " \t");
