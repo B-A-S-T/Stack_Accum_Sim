@@ -52,7 +52,7 @@ mem_word *stack_segment;
 mem_word *kernal_segment;
 mem_addr stack_top;
 mem_addr data_limit;
-char *sourceTokens[NUM_OF_TOKENS];
+mem_word *sourceTokens[NUM_OF_TOKENS];
 
 /* Prototypes */
 
@@ -118,9 +118,8 @@ void parse_source_code(char *filename){
         token = strtok(line, " \t");
         while(token != NULL) {
             if(strcmp(token, "\n") != 0){
-            printf("BNoops:%d    %08x\n", length, *token);
             text_segment[tokenCounter] = *(instruction*) token;
-            printf("Token after: %08x\n", text_segment[tokenCounter]);
+            printf("Token after: %08x\n", source_tokens[tokenCounter]);
             tokenCounter += 1;
             }
             token = strtok(NULL, " \t");
