@@ -52,10 +52,10 @@ mem_word *stack_segment;
 mem_word *kernal_segment;
 mem_addr stack_top;
 mem_addr data_limit;
-mem_word *sourceTokens[NUM_OF_TOKENS];
+mem_word *source_tokens[NUM_OF_TOKENS];
 
 /* Prototypes */
-
+void make_memory();
 void parse_source_code(char *filename);
 mem_word* read_mem(mem_addr address);
 instruction* read_inst(mem_addr address);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
     
     make_memory();
     parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
-    printf("The first token is:%08x \n", text_segment[0]);
+    printf("The first token is:%08x \n", data_segment[0]);
     free(data_segment);
     free(stack_segment);
     free(kernal_segment);
@@ -104,29 +104,70 @@ void make_memory(){
 
 void parse_source_code(char *filename){
     FILE *fp;
+    short data_load = 0;
     size_t length = 0;
     ssize_t read;
     char *token = NULL;
     char *line = NULL;
     int tokenCounter = 0;
-    fp = fopen("/home/ian/Stack_Accum_Sim/testing.txt", "r");
+    fp = fopen("/home/ian/Documents/Stack_Accum_Sim/testing.txt", "r");
+
     if(fp == NULL){
        printf("Could not open file.\n");
         exit (1);
     }
     while((read = getline(&line, &length, fp)) != -1){
-        token = strtok(line, " \t");
-        while(token != NULL) {
-            if(strcmp(token, "\n") != 0){
-            text_segment[tokenCounter] = *(instruction*) token;
+            if(strcmp(line, "\n") != 0){
+            line[strcspn(line, "\n")] = 0;
+                if(strcmp(line, ".data") == 0){
+                     data_load = 1;
+                     continue;
+                }
+                if(strcmp(line, ".text") == 0){
+                     data_load = 0;
+                     continue;
+}               
+                if(data_load == 1){
+                    load_data(line);
+                }
+                else{
+                    //load_text(token, text_index);
+                }
+/*
+            printf("Token string: %s\n", token);
+            source_tokens[tokenCounter] = *(mem_word*) token;
             printf("Token after: %08x\n", source_tokens[tokenCounter]);
             tokenCounter += 1;
+*/
             }
-            token = strtok(NULL, " \t");
-        }
     }
 
 }
+
+load_data(char* token){
+    char *address = NULL;
+    char *value = NULL;
+    mem_addr addr = 0; 
+    mem_word val = 0;
+    
+    address = strtok(token, " \t");
+    value = strtok(NULL, " \t");
+    printf("Address: %s, Value: %s\n", address, value);
+
+    addr = (mem_addr) strtol(address, (char **)NULL, 16);
+    val = (mem_word) strtol(value, (char **)NULL, 16);
+    
+    write_mem(addr, val);
+}
+
+mem_word get_op_code(char* token){
+    
+    
+
+
+
+}
+
 
 /* For each of the reads and writes we first check to see if the address
     is less than its address top boundary and then the bottom.*/
