@@ -3,5 +3,4 @@
 
 .text
 PUSH 0x40000000
-
-ADD
+END

@@ -34,7 +34,7 @@ typedef int32_t instruction;
 #define MAX_SEG_SIZE 33554428
 #define TEXT_START ((mem_word) 0x50000000)
 #define DATA_START ((mem_word) 0x40000000)
-#define STACK_BOTTOM  ((mem_word) 0x30000000) /*Grows Down*/
+#define STACK_BOTTOM  ((mem_addr) 0x70000000) 
 #define KERNAL_START ((mem_word) 0x60000000)
 
 #define NUM_OF_TOKENS 200
@@ -50,7 +50,7 @@ instruction* text_segment;
 mem_word *data_segment;
 mem_word *stack_segment;
 mem_word *kernal_segment;
-mem_addr stack_top;
+mem_addr stack_top = STACK_BOTTOM;
 mem_addr data_limit;
 mem_word *source_tokens[NUM_OF_TOKENS];
 
@@ -61,22 +61,54 @@ void parse_source_code(char *filename);
 void load_data(char* token);
 void load_text(char* token, int *index);
 instruction get_opCode(char* instr);
-mem_word* read_mem(mem_addr address);
-instruction* read_inst(mem_addr address);
+mem_word read_mem(mem_addr address);
+instruction read_inst(mem_addr address);
 void write_instr(mem_addr address, instruction instr);
 void write_mem(mem_addr address, mem_word value);
-//mem_word load(mem_addr address);
-//void push(mem_word value);
-//void pop(mem_word value);
-//void add();
-//void mult();
-//void end();
+void push(mem_addr address);
+void pop(mem_addr address);
+void add();
+void mult();
 
 int main(int argc, char *argv[]){
     
     make_memory();
     parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
-    printf("The first token is:%08x \n", text_segment[2]);
+    instruction instr;
+    int usermode = 1;
+    mem_word to_push = 0;
+    mem_addr to_pop = 0;
+    mem_addr pc = TEXT_START;
+
+    while(usermode){
+        instr = read_inst(pc);
+        pc += 1;
+        switch(instr){
+            case 0:
+                to_push = (mem_word) read_inst(pc);
+                push(to_push);
+                pc += 1;
+                break;
+            case 1:
+                to_pop = (mem_addr) read_inst(pc);
+                pop(to_pop);
+                pc += 1;
+                break;
+            case 2:
+                add();
+                break;
+            case 3:
+                mult();
+                break;
+            case 4:
+                usermode = 0;
+                printf("TOP OF STACK: %d\n\n", stack_segment[(stack_top - STACK_BOTTOM)]);
+                break;
+
+        }
+
+
+    }
     free(data_segment);
     free(stack_segment);
     free(kernal_segment);
@@ -137,12 +169,6 @@ void parse_source_code(char *filename){
                 else{
                     load_text(line, &text_index);
                 }
-/*
-            printf("Token string: %s\n", token);
-            source_tokens[tokenCounter] = *(mem_word*) token;
-            printf("Token after: %08x\n", source_tokens[tokenCounter]);
-            tokenCounter += 1;
-*/
             }
     }
 
@@ -156,7 +182,6 @@ load_data(char* token){
     
     address = strtok(token, " \t");
     value = strtok(NULL, " \t");
-    printf("Address: %s, Value: %s\n", address, value);
 
     addr = (mem_addr) strtol(address, (char **)NULL, 16);
     val = (mem_word) strtol(value, (char **)NULL, 16);
@@ -189,18 +214,19 @@ instruction get_opCode(char *instr){
 
 /* For each of the reads and writes we first check to see if the address
     is less than its address top boundary and then the bottom.*/
-mem_word* read_mem(mem_addr address){
+mem_word read_mem(mem_addr address){
     if((address <  DATA_TOP) && (address >= DATA_START))
-        return &data_segment[(address - DATA_START)];
+        return data_segment[(address - DATA_START)];
     else{
         printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
     }
 }
 
-instruction* read_inst(mem_addr address){
-    if((address <  TEXT_TOP) && (address >= TEXT_START))
-        return &text_segment[(address - TEXT_START)];
+instruction read_inst(mem_addr address){
+    if((address <  TEXT_TOP) && (address >= TEXT_START)){
+        return text_segment[(address - TEXT_START)];
+}
     else{
         printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
@@ -227,13 +253,35 @@ void write_mem(mem_addr address, mem_word value){
     }
 }
 
+void push(mem_addr address){
+        mem_word value = read_mem(address);
+        stack_top += 1;
+        stack_segment[(stack_top - STACK_BOTTOM)] = value;
+}
+
+void pop(mem_addr address){
+    if(address == -1){
+        stack_top -= 1;
+        return NULL;
+    }
+    if(stack_top == STACK_BOTTOM){
+        printf("Trying to POP empty stack:EXITING");
+        exit(1);
+    }
+    mem_word value = stack_segment[(stack_top - STACK_BOTTOM)];
+    stack_top -= 1;
+    write_mem(address, value);
+}
+
+void add(){
+    
+
+}
+
+void mult(){
 
 
-
-
-
-
-
+}
 
 
 
