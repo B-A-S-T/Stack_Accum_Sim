@@ -55,8 +55,12 @@ mem_addr data_limit;
 mem_word *source_tokens[NUM_OF_TOKENS];
 
 /* Prototypes */
+
 void make_memory();
 void parse_source_code(char *filename);
+void load_data(char* token);
+void load_text(char* token, int *index);
+instruction get_opCode(char* instr);
 mem_word* read_mem(mem_addr address);
 instruction* read_inst(mem_addr address);
 void write_instr(mem_addr address, instruction instr);
@@ -72,7 +76,7 @@ int main(int argc, char *argv[]){
     
     make_memory();
     parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
-    printf("The first token is:%08x \n", data_segment[0]);
+    printf("The first token is:%08x \n", text_segment[2]);
     free(data_segment);
     free(stack_segment);
     free(kernal_segment);
@@ -107,9 +111,9 @@ void parse_source_code(char *filename){
     short data_load = 0;
     size_t length = 0;
     ssize_t read;
+    int *text_index = 0;
     char *token = NULL;
     char *line = NULL;
-    int tokenCounter = 0;
     fp = fopen("/home/ian/Documents/Stack_Accum_Sim/testing.txt", "r");
 
     if(fp == NULL){
@@ -131,7 +135,7 @@ void parse_source_code(char *filename){
                     load_data(line);
                 }
                 else{
-                    //load_text(token, text_index);
+                    load_text(line, &text_index);
                 }
 /*
             printf("Token string: %s\n", token);
@@ -160,14 +164,28 @@ load_data(char* token){
     write_mem(addr, val);
 }
 
-mem_word get_op_code(char* token){
+void load_text(char* token, int *index){
+    char *instr = strtok(token, " \t");
+    instruction op_code = 0;
+
+    while(instr != NULL){
+        op_code = get_opCode(instr);
+        mem_addr address = TEXT_START + *index;
+        write_instr(address, op_code);
+        *index += 1;
+        instr = strtok(NULL, " \t");
+    }
     
-    
-
-
-
 }
 
+instruction get_opCode(char *instr){
+    if(strcmp(instr, "PUSH") == 0) return 0;
+    else if (strcmp(instr, "POP") == 0) return 1;
+    else if (strcmp(instr, "ADD") == 0) return 2;
+    else if (strcmp(instr, "MUL") == 0) return 3;
+    else if (strcmp(instr, "END") == 0) return 4;
+    else return (instruction) strtol(instr, (char **)NULL, 16);
+}
 
 /* For each of the reads and writes we first check to see if the address
     is less than its address top boundary and then the bottom.*/
