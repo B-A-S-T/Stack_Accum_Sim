@@ -207,7 +207,7 @@ instruction get_opCode(char *instr){
     if(strcmp(instr, "PUSH") == 0) return 0;
     else if (strcmp(instr, "POP") == 0) return 1;
     else if (strcmp(instr, "ADD") == 0) return 2;
-    else if (strcmp(instr, "MUL") == 0) return 3;
+    else if (strcmp(instr, "MULT") == 0) return 3;
     else if (strcmp(instr, "END") == 0) return 4;
     else return (instruction) strtol(instr, (char **)NULL, 16);
 }
@@ -274,12 +274,18 @@ void pop(mem_addr address){
 }
 
 void add(){
-    
+    mem_word added_value = stack_segment[(stack_top - STACK_BOTTOM)] 
+            + stack_segment[(stack_top - STACK_BOTTOM - 1)];
+    pop(-1);
+    stack_segment[stack_top - STACK_BOTTOM] = added_value;
 
 }
 
 void mult(){
-
+    mem_word added_value = stack_segment[(stack_top - STACK_BOTTOM)] 
+            * stack_segment[(stack_top - STACK_BOTTOM - 1)];
+    pop(-1);
+    stack_segment[stack_top - STACK_BOTTOM] = added_value;
 
 }
 
