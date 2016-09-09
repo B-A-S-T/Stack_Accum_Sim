@@ -73,7 +73,7 @@ void mult();
 int main(int argc, char *argv[]){
     
     make_memory();
-    parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
+    parse_source_code(argv[1]);
     instruction instr;
     int usermode = 1;
     mem_word to_push = 0;
@@ -146,7 +146,7 @@ void parse_source_code(char *filename){
     int *text_index = 0;
     char *token = NULL;
     char *line = NULL;
-    fp = fopen("/home/ian/Documents/Stack_Accum_Sim/testing.txt", "r");
+    fp = fopen(filename, "r");
 
     if(fp == NULL){
        printf("Could not open file.\n");
