@@ -61,22 +61,56 @@ void parse_source_code(char *filename);
 void load_data(char* token);
 void load_text(char* token, int *index);
 instruction get_opCode(char* instr);
-mem_word* read_mem(mem_addr address);
-instruction* read_inst(mem_addr address);
+mem_word read_mem(mem_addr address);
+instruction read_inst(mem_addr address);
 void write_instr(mem_addr address, instruction instr);
 void write_mem(mem_addr address, mem_word value);
-//mem_word load(mem_addr address);
-//void push(mem_word value);
-//void pop(mem_word value);
-//void add();
-//void mult();
-//void end();
+void add(mem_word* accum, mem_addr operand);
+void mult(mem_word* accum, mem_addr operand);
 
 int main(int argc, char *argv[]){
     
     make_memory();
-    parse_source_code("/home/ian/Stack_Accum_Sim/testing.txt");
-    printf("The first token is:%08x \n", text_segment[2]);
+    parse_source_code(argv[1]);
+    mem_word accumulator;
+    instruction instr;
+    int usermode = 1;
+    mem_word to_load = 0;
+    mem_addr to_store = 0;
+    mem_addr to_add = 0;
+    mem_addr to_mult = 0; 
+    mem_addr pc = TEXT_START;
+
+    while(usermode){
+        instr = read_inst(pc);
+        pc += 1;
+        switch(instr){
+            case 0:
+                to_load = (mem_word) read_inst(pc); 
+                accumulator = read_mem(to_load);
+                pc += 1;
+                break;
+            case 1:
+                to_store = (mem_addr) read_inst(pc);
+                write_mem(to_store, accumulator);
+                pc += 1;
+                break;
+            case 2:
+                to_add = (mem_addr) read_inst(pc);
+                add(&accumulator, to_add);
+                pc +=1;
+                break;
+            case 3:
+                to_mult = (mem_addr) read_inst(pc);
+                mult(&accumulator, to_mult);
+                pc +=1;
+                break;
+            case 4:
+                usermode = 0;
+                printf("Value in Accumulator:  %d\n\n", accumulator);
+                break;
+        }
+    }
     free(data_segment);
     free(stack_segment);
     free(kernal_segment);
@@ -114,7 +148,7 @@ void parse_source_code(char *filename){
     int *text_index = 0;
     char *token = NULL;
     char *line = NULL;
-    fp = fopen("/home/ian/Documents/Stack_Accum_Sim/testing.txt", "r");
+    fp = fopen(filename, "r");
 
     if(fp == NULL){
        printf("Could not open file.\n");
@@ -137,12 +171,6 @@ void parse_source_code(char *filename){
                 else{
                     load_text(line, &text_index);
                 }
-/*
-            printf("Token string: %s\n", token);
-            source_tokens[tokenCounter] = *(mem_word*) token;
-            printf("Token after: %08x\n", source_tokens[tokenCounter]);
-            tokenCounter += 1;
-*/
             }
     }
 
@@ -156,7 +184,6 @@ load_data(char* token){
     
     address = strtok(token, " \t");
     value = strtok(NULL, " \t");
-    printf("Address: %s, Value: %s\n", address, value);
 
     addr = (mem_addr) strtol(address, (char **)NULL, 16);
     val = (mem_word) strtol(value, (char **)NULL, 16);
@@ -179,28 +206,29 @@ void load_text(char* token, int *index){
 }
 
 instruction get_opCode(char *instr){
-    if(strcmp(instr, "PUSH") == 0) return 0;
-    else if (strcmp(instr, "POP") == 0) return 1;
+    if(strcmp(instr, "LOAD") == 0) return 0;
+    else if (strcmp(instr, "STO") == 0) return 1;
     else if (strcmp(instr, "ADD") == 0) return 2;
-    else if (strcmp(instr, "MUL") == 0) return 3;
+    else if (strcmp(instr, "MULT") == 0) return 3;
     else if (strcmp(instr, "END") == 0) return 4;
     else return (instruction) strtol(instr, (char **)NULL, 16);
 }
 
 /* For each of the reads and writes we first check to see if the address
     is less than its address top boundary and then the bottom.*/
-mem_word* read_mem(mem_addr address){
+mem_word read_mem(mem_addr address){
     if((address <  DATA_TOP) && (address >= DATA_START))
-        return &data_segment[(address - DATA_START)];
+        return data_segment[(address - DATA_START)];
     else{
         printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
     }
 }
 
-instruction* read_inst(mem_addr address){
-    if((address <  TEXT_TOP) && (address >= TEXT_START))
-        return &text_segment[(address - TEXT_START)];
+instruction read_inst(mem_addr address){
+    if((address <  TEXT_TOP) && (address >= TEXT_START)){
+        return text_segment[(address - TEXT_START)];
+}
     else{
         printf("We couldn't access that address check addresses avaliable\n");
         return NULL;
@@ -226,4 +254,29 @@ void write_mem(mem_addr address, mem_word value){
         return NULL;
     }
 }
+
+void add(mem_word* accum, mem_addr operand){
+    mem_word quotient = read_mem(operand);
+    *accum = quotient + *accum;
+}
+
+void mult(mem_word* accum, mem_addr operand){
+
+    mem_word product = read_mem(operand);
+    *accum = product * (*accum);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
