@@ -56,9 +56,6 @@
   Data can only be created from 0x40000000 - 0x4fffffff, if creation doesn't work, try to stay close to start index, Only Allocating 
   8Milion bytes because of memory limitations on my system, can allocate more by changing MAX_SEG_SIZE value.
   
-  FINAL NOTE: If file cannot be found when passing in source, try using the 
-  path instead. Haven't had this problem but it is a possibility.
-  
   ----------------------------------------------------------------------------------------------------
 
   Example Source code for stack machine:
@@ -84,3 +81,9 @@
   
   ----------------------------------------------------------------------------------------------------
   
+  FINAL NOTES: 
+  If file cannot be found when passing in source, try using the 
+  path instead. Haven't had this problem but it is a possibility.
+  
+  Instructions are case sensitive. All instructions must be made with CAPS.
+  Look at StackCode and AccumCode for complete example files.
