@@ -3,7 +3,7 @@
 0x40000001 7
 0x40000002 5
 0x40000003 4 
-.asciiz "Quadratic Solution: "
+.asciiz "Answer = "
 .text
 PUSH 0x40000000
 PUSH 0x40000000
