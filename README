@@ -1,32 +1,84 @@
-Stack and Accumulator machine architecture using 32 bit addressing based off of
-  the SPIM MIPS simulator.
+  Created by Ian Thomas with help of Lanxin Ma, September 2016.
+  Group 1 Computer Architecture
   
+  Stack and Accumulator type architecture machines simulated using 32 bit addressing based off of
+  the SPIM MIPS simulator.
   
   Reference code:
   http://www.cs.rpi.edu/~mehtaa/comporg/spim-8.0/CPU/mem.c
   https://www.unf.edu/public/cda4102/ychua/spim/mem.
   
+  ----------------------------------------------------------------------------------------------------
   
   STACK INSTRUCTIONS:
-  Push MEM_ADDRESS
-  POP MEM_ADDRESS
-  ADD 
-  MUL
+  PUSH MEM_ADDRESS - Push a value on the stack at a memory address
+  POP MEM_ADDRESS - Pop the top value of the stack off into a memory address.
+  ADD - Add top two values on the stack, pop them off, push the result back on.
+  MUL - Multiply top two values on the stack, pop them off, push the result back on.
+  END - End program, Prints top of stack.
+  PRINT STRING_ID - Prints value of a string saved in data at Id.
+  
+  COMPILE & RUN:
+  gcc stackSim.c -w -o StackMachine
+  ./StackMachine source_code_filename
+  
+  ----------------------------------------------------------------------------------------------------
+  
+  ACCUMULATOR INSTRUCTIONS:
+  LOAD MEM_ADDRESS - Load a value from an address into the accumulator.
+  STO MEM_ADDRESS- Store the value of the accumulator into an address.
+  ADD MEM_ADDRESS- Add the value of the accumulator with a value from memory at an address.
+  MULT MEM_ADDRESS- Multiply the value of the accumulator with a value from memory at an address.
+  END - End program, Prints the value of the accumulator.
+  PRINT STRING_ID - Prints value of a string saved in data at Id.
+    
+  COMPILE & RUN:
+  gcc accumSim.c -w -o AccumMachine
+  ./AccumMachine source_code_filename
+  
+  ----------------------------------------------------------------------------------------------------
+  USAGE:
+  .data section -> .text section
+  To create data, first input the address followed by a space, then the value.
+  To create a string in the data section, specify this by .asciiz, then the string inside quotes.
+  By Default only 10 strings are allowed of 100 Characters each, this can be changed by changing the STRING_SIZE and NUM_STRINGS fields.
+  String IDs are their index of creation starting at 0. 
+  EX:
+  .data
+  .asciiz "String 0"
+  .asciiz "String 1"
+  .text
+  PRINT 0 //Prints: String 0
+  PRINT 1 //Prints: String 1
   END
   
-  gcc stackSim.c -o StackMachine
-  ./StackMachine source_code_filename
+  Data can only be created from 0x40000000 - 0x4fffffff, if creation doesn't work, try to stay close to start index, Only Allocating 
+  8Milion bytes because of memory limitations on my system, can allocate more by changing MAX_SEG_SIZE value.
+  
+  FINAL NOTE: If file cannot be found when passing in source, try using the path instead. Haven't had this problem but it is a possibility.
+  
+  ----------------------------------------------------------------------------------------------------
 
   Example Source code for stack machine:
   .data
   MEM_ADDRESS Value
   MEM_ADDRESS Value
-  
+  .asciiz “This is a string inside quotes“
   .text
-  push MEM_ADDRESS
-  push MEM_ADDRESS
-  add
+  PUSH MEM_ADDRESS
+  PUSH MEM_ADDRESS
+  ADD
   END
   
-  -TODO: ACCUMULATOR
+    Example Source code for accumulator machine:
+  .data
+  MEM_ADDRESS Value
+  MEM_ADDRESS Value
+  .asciiz “This is a string inside quotes“
+  .text
+  LOAD MEM_ADDRESS
+  ADD MEM_ADDRESS
+  END
+  
+  ----------------------------------------------------------------------------------------------------
   
