@@ -41,7 +41,8 @@
   .data section -> .text section
   To create data, first input the address followed by a space, then the value.
   To create a string in the data section, specify this by .asciiz, then the string inside quotes.
-  By Default only 10 strings are allowed of 100 Characters each, this can be changed by changing the STRING_SIZE and NUM_STRINGS fields.
+  By Default only 10 strings are allowed of 100 Characters each, this can be changed by 
+  changing the STRING_SIZE and NUM_STRINGS fields.
   String IDs are their index of creation starting at 0. 
   EX:
   .data
@@ -55,7 +56,8 @@
   Data can only be created from 0x40000000 - 0x4fffffff, if creation doesn't work, try to stay close to start index, Only Allocating 
   8Milion bytes because of memory limitations on my system, can allocate more by changing MAX_SEG_SIZE value.
   
-  FINAL NOTE: If file cannot be found when passing in source, try using the path instead. Haven't had this problem but it is a possibility.
+  FINAL NOTE: If file cannot be found when passing in source, try using the 
+  path instead. Haven't had this problem but it is a possibility.
   
   ----------------------------------------------------------------------------------------------------
 
@@ -70,7 +72,7 @@
   ADD
   END
   
-    Example Source code for accumulator machine:
+  Example Source code for accumulator machine:
   .data
   MEM_ADDRESS Value
   MEM_ADDRESS Value
