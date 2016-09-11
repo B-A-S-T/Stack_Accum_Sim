@@ -53,8 +53,9 @@
   PRINT 1 //Prints: String 1
   END
   
-  Data can only be created from 0x40000000 - 0x4fffffff, if creation doesn't work, try to stay close to start index, Only Allocating 
-  8Milion bytes because of memory limitations on my system, can allocate more by changing MAX_SEG_SIZE value.
+  Data can only be created from 0x40000000 - 0x4fffffff, if creation doesn't work, try to stay close to start index, 
+  Only Allocating 8Milion bytes because of memory limitations on my system, can allocate more 
+  by changing MAX_SEG_SIZE value.
   
   ----------------------------------------------------------------------------------------------------
 
@@ -87,3 +88,5 @@
   
   Instructions are case sensitive. All instructions must be made with CAPS.
   Look at StackCode and AccumCode for complete example files.
+  
+  ----------------------------------------------------------------------------------------------------
