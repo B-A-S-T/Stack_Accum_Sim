@@ -19,8 +19,6 @@
                         Address is converted so we can access it with our array.
 */
 
-
-
 /* Typedefs and Defines*/
 #include <stdint.h>
 #include <stdio.h>
@@ -34,7 +32,6 @@ typedef int32_t instruction;
 #define MAX_SEG_SIZE 33554428
 #define TEXT_START ((mem_word) 0x50000000)
 #define DATA_START ((mem_word) 0x40000000)
-#define STACK_BOTTOM  ((mem_word) 0x30000000) /*Grows Down*/
 #define KERNAL_START ((mem_word) 0x60000000)
 
 #define NUM_OF_TOKENS 200
@@ -50,7 +47,6 @@ instruction* text_segment;
 mem_word *data_segment;
 mem_word *stack_segment;
 mem_word *kernal_segment;
-mem_addr stack_top;
 mem_addr data_limit;
 mem_word *source_tokens[NUM_OF_TOKENS];
 
@@ -126,10 +122,6 @@ void make_memory(){
 
     data_segment = malloc(MAX_SEG_SIZE);
     if(data_segment == NULL)
-        exit(1);
-
-    stack_segment = malloc(MAX_SEG_SIZE);
-    if(stack_segment == NULL)
         exit(1);
     kernal_segment = malloc(MAX_SEG_SIZE);
     if(kernal_segment == NULL)
@@ -211,6 +203,7 @@ instruction get_opCode(char *instr){
     else if (strcmp(instr, "ADD") == 0) return 2;
     else if (strcmp(instr, "MULT") == 0) return 3;
     else if (strcmp(instr, "END") == 0) return 4;
+    else if (strcmp(instr, "PRINT") == 0) return 5;
     else return (instruction) strtol(instr, (char **)NULL, 16);
 }
 
