@@ -32,6 +32,8 @@ typedef int32_t mem_word;
 typedef int32_t instruction;
 
 #define MAX_SEG_SIZE 33554428
+#define NUM_STRINGS 10
+#define STRING_SIZE 100
 #define TEXT_START ((mem_word) 0x50000000)
 #define DATA_START ((mem_word) 0x40000000)
 #define STACK_BOTTOM  ((mem_addr) 0x70000000) 
@@ -53,6 +55,8 @@ mem_word *kernal_segment;
 mem_addr stack_top = STACK_BOTTOM;
 mem_addr data_limit;
 mem_word *source_tokens[NUM_OF_TOKENS];
+int last_string = 0;
+char strings[NUM_STRINGS][STRING_SIZE];
 
 /* Prototypes */
 
@@ -79,6 +83,7 @@ int main(int argc, char *argv[]){
     mem_word to_push = 0;
     mem_addr to_pop = 0;
     mem_addr pc = TEXT_START;
+    mem_addr to_print;
 
     while(usermode){
         instr = read_inst(pc);
@@ -102,7 +107,15 @@ int main(int argc, char *argv[]){
                 break;
             case 4:
                 usermode = 0;
-                printf("TOP OF STACK: %d\n\n", stack_segment[(stack_top - STACK_BOTTOM)]);
+                printf("%d\n", stack_segment[(stack_top - STACK_BOTTOM)]);
+                break;
+            case 5:
+                to_print = (mem_addr) read_inst(pc);
+                if(to_print >= last_string || to_print < 0){
+                    printf("Failed to print that string: Wrong Index");
+                }
+                printf("%s", strings[to_print]);
+                pc += 1;
                 break;
 
         }
@@ -125,7 +138,6 @@ void make_memory(){
     data_segment = malloc(MAX_SEG_SIZE);
     if(data_segment == NULL)
         exit(1);
-
     stack_segment = malloc(MAX_SEG_SIZE);
     if(stack_segment == NULL)
         exit(1);
@@ -181,12 +193,19 @@ load_data(char* token){
     mem_word val = 0;
     
     address = strtok(token, " \t");
+    if(strcmp(address, ".asciiz") == 0){
+       address = strtok(NULL, "\"") ;
+        strcpy(strings[last_string], address);
+        last_string += 1;
+    }
+    else{
     value = strtok(NULL, " \t");
 
     addr = (mem_addr) strtol(address, (char **)NULL, 16);
     val = (mem_word) strtol(value, (char **)NULL, 16);
     
     write_mem(addr, val);
+    }
 }
 
 void load_text(char* token, int *index){
@@ -209,6 +228,7 @@ instruction get_opCode(char *instr){
     else if (strcmp(instr, "ADD") == 0) return 2;
     else if (strcmp(instr, "MULT") == 0) return 3;
     else if (strcmp(instr, "END") == 0) return 4;
+    else if (strcmp(instr, "PRINT") == 0) return 5;
     else return (instruction) strtol(instr, (char **)NULL, 16);
 }
 
